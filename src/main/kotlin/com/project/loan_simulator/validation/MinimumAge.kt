@@ -10,7 +10,7 @@ import kotlin.reflect.KClass
 @Constraint(validatedBy = [MinimumAgeValidator::class])
 @MustBeDocumented
 annotation class MinimumAge (
-    val message: String = "O cliente deve ser maior de 18 anos",
+    val message: String = "O cliente deve ter no mínimo 18 anos",
     val groups: Array<KClass<Any>> = [],
     val payload: Array<KClass<Payload>> = []
 )
