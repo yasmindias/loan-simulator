@@ -14,6 +14,6 @@ class MinimumAgeValidator : ConstraintValidator<MinimumAge, LocalDate> {
 
     override fun isValid(value: LocalDate?, context: ConstraintValidatorContext?): Boolean {
         val period = Period.between(value, LocalDate.now())
-        return period.years < MINIMUM_AGE
+        return period.years >= MINIMUM_AGE
     }
 }

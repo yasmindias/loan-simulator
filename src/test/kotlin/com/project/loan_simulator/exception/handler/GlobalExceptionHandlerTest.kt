@@ -37,7 +37,7 @@ class GlobalExceptionHandlerTest {
     @Test
     fun `should handle with exception MethodArgumentNotValidException`() {
         // given
-        val request = MockEntityBuild.simulationRequest(birthDate = LocalDate.parse("2007-01-26"))
+        val request = MockEntityBuild.simulationRequest(birthDate = LocalDate.now().minusYears(15))
 
         // when
         val result = this.mock.perform(

@@ -6,12 +6,12 @@ import java.time.LocalDate
 class MockEntityBuild {
     companion object {
         fun simulationRequest(
-            totalValue: Int? = 1,
-            birthDate: LocalDate? = LocalDate.now(),
-            paymentTerm: Int? = 1
+            totalValue: Int? = null,
+            birthDate: LocalDate? = null,
+            paymentTerm: Int? = null
         ) = SimulationRequest(
             totalValue = totalValue ?: 10000,
-            birthDate = birthDate ?: LocalDate.parse("2005-03-09"),
+            birthDate = birthDate ?: LocalDate.now().minusYears(18),
             paymentTerm = paymentTerm ?: 32
         )
     }
