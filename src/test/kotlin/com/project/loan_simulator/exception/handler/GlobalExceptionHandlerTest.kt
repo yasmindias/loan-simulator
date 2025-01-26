@@ -1,15 +1,13 @@
-package com.project.loan_simulator.controller
+package com.project.loan_simulator.exception.handler
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.project.loan_simulator.configuration.JacksonConfig
-import com.project.loan_simulator.dto.SimulationRequest
+import com.project.loan_simulator.controller.SimulationController
 import com.project.loan_simulator.util.MockEntityBuild
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.junit.jupiter.MockitoExtension
-import org.springframework.context.annotation.Import
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
@@ -18,10 +16,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import java.time.LocalDate
 
-
 @ExtendWith(MockitoExtension::class)
-@Import(JacksonConfig::class)
-class SimulationControllerTest {
+class GlobalExceptionHandlerTest {
 
     private lateinit var simulationController: SimulationController
     private lateinit var objectMapper: ObjectMapper
@@ -33,15 +29,17 @@ class SimulationControllerTest {
         this.objectMapper = ObjectMapper().registerModule(JavaTimeModule())
         this.mock = MockMvcBuilders.standaloneSetup(simulationController)
             .setCustomArgumentResolvers(PageableHandlerMethodArgumentResolver())
+            .setControllerAdvice(GlobalExceptionHandler())
             .build()
     }
 
-    @Test
-    fun `should simulate loan with success`() {
-        //given
-        val request = MockEntityBuild.simulationRequest()
 
-        //when
+    @Test
+    fun `should handle with exception MethodArgumentNotValidException`() {
+        // given
+        val request = MockEntityBuild.simulationRequest(birthDate = LocalDate.parse("2007-01-26"))
+
+        // when
         val result = this.mock.perform(
             MockMvcRequestBuilders.post("/simulation")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -49,24 +47,16 @@ class SimulationControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
         )
 
-        //then
-        result.andExpect(MockMvcResultMatchers.status().isNoContent)
+        // then
+        result.andExpect(MockMvcResultMatchers.status().isBadRequest)
+        result.andExpect(MockMvcResultMatchers.jsonPath("$.status").value(400))
+        result.andExpect(MockMvcResultMatchers.jsonPath("$.error").value("Bad Request"))
+        result.andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Error on validation"))
+        result.andExpect(MockMvcResultMatchers.jsonPath("$.errors.length()").value("1"))
     }
 
     @Test
-    fun `should return error for underage client`() {
-        //given
-        val request = SimulationRequest(10000, LocalDate.parse("2007-03-09"), 32)
-
-        //when
-        val result = this.mock.perform(
-            MockMvcRequestBuilders.post("/simulation")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request))
-                .accept(MediaType.APPLICATION_JSON)
-        )
-
-        //then
-        result.andExpect(MockMvcResultMatchers.status().isBadRequest)
+    fun `should handle with generic exception`() {
+        //TODO implement test
     }
 }
