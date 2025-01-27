@@ -19,26 +19,6 @@ repositories {
 	mavenCentral()
 }
 
-val integrationTest = sourceSets.create("integrationTest"){
-	kotlin.srcDir("$projectDir/src/integrationTest/kotlin")
-	compileClasspath += sourceSets.main.get().output
-	runtimeClasspath += sourceSets.main.get().output
-	compileClasspath += sourceSets.test.get().output
-	runtimeClasspath += sourceSets.test.get().output
-}
-
-tasks.register<Test>(integrationTest.name) {
-	classpath = integrationTest.runtimeClasspath
-	testClassesDirs = integrationTest.output.classesDirs
-
-	useJUnitPlatform {
-		excludeTags("slow")
-	}
-}
-
-val integrationTestImplementation: Configuration by
-configurations.getting { extendsFrom(configurations.testImplementation.get()) }
-
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-web")
@@ -69,3 +49,26 @@ allOpen {
 tasks.withType<Test> {
 	useJUnitPlatform()
 }
+
+//-------------------------------
+//   Integration Tests Setup
+//-------------------------------
+val integrationTest = sourceSets.create("integrationTest"){
+	kotlin.srcDir("$projectDir/src/integrationTest/kotlin")
+	compileClasspath += sourceSets.main.get().output
+	runtimeClasspath += sourceSets.main.get().output
+	compileClasspath += sourceSets.test.get().output
+	runtimeClasspath += sourceSets.test.get().output
+}
+
+tasks.register<Test>(integrationTest.name) {
+	classpath = integrationTest.runtimeClasspath
+	testClassesDirs = integrationTest.output.classesDirs
+
+	useJUnitPlatform {
+		excludeTags("slow")
+	}
+}
+
+val integrationTestImplementation: Configuration by
+configurations.getting { extendsFrom(configurations.testImplementation.get()) }
