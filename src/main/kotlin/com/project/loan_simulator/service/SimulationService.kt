@@ -1,10 +1,27 @@
 package com.project.loan_simulator.service
 
+import com.project.loan_simulator.dto.SimulationRequest
+import com.project.loan_simulator.dto.SimulationResponse
+import com.project.loan_simulator.util.yearsSince
+import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.math.RoundingMode
 import kotlin.math.pow
 
+@Service
 class SimulationService {
+    fun simulateLoan(request: SimulationRequest): SimulationResponse {
+        val annualInterestRate = returnAnnualInterestRateByAge(request.birthDate.yearsSince())
+        val monthlyPayment = calculateMonthlyPayments(request.totalValue, annualInterestRate, request.paymentTerm)
+        val totalAmount = monthlyPayment.multiply(BigDecimal(request.paymentTerm)).setScale(2, RoundingMode.UP)
+        val totalInterestPaid = totalAmount.minus(request.totalValue)
+
+        return SimulationResponse(
+            totalAmount = totalAmount,
+            monthlyPayment = monthlyPayment,
+            totalInterestPaid = totalInterestPaid
+        )
+    }
 
     fun calculateMonthlyPayments(totalAmount: BigDecimal, annualInterestRate: BigDecimal, paymentTerm: Int) : BigDecimal {
         val monthlyInterestRate = getMonthlyInterestRate(annualInterestRate)

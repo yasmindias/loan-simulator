@@ -3,12 +3,12 @@ package com.project.loan_simulator.exception.handler
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.project.loan_simulator.controller.SimulationController
+import com.project.loan_simulator.service.SimulationService
 import com.project.loan_simulator.util.MockEntityBuild
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.junit.jupiter.MockitoExtension
-import org.springframework.data.web.PageableHandlerMethodArgumentResolver
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
@@ -20,15 +20,16 @@ import java.time.LocalDate
 class GlobalExceptionHandlerTest {
 
     private lateinit var simulationController: SimulationController
+    private lateinit var simulationService: SimulationService
     private lateinit var objectMapper: ObjectMapper
     private lateinit var mock: MockMvc
 
     @BeforeEach
     fun setUp() {
-        this.simulationController = SimulationController()
+        this.simulationService = SimulationService()
+        this.simulationController = SimulationController(simulationService)
         this.objectMapper = ObjectMapper().registerModule(JavaTimeModule())
         this.mock = MockMvcBuilders.standaloneSetup(simulationController)
-            .setCustomArgumentResolvers(PageableHandlerMethodArgumentResolver())
             .setControllerAdvice(GlobalExceptionHandler())
             .build()
     }

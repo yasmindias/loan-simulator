@@ -18,6 +18,24 @@ class SimulationServiceTest {
     }
 
     @Test
+    fun `should return simulation data with success`() {
+        //given
+        val request = MockEntityBuild.simulationRequest()
+
+        //when
+        val result = simulationService.simulateLoan(request)
+
+        //then
+        val expectedTotalAmount = BigDecimal(151200.72).setScale(2, RoundingMode.HALF_EVEN)
+        val expectedMonthlyPayment = BigDecimal(4200.02).setScale(2, RoundingMode.HALF_EVEN)
+        val expectedInterestPaid = BigDecimal(141200.72).setScale(2, RoundingMode.HALF_EVEN)
+
+        assertEquals(expectedTotalAmount, result.totalAmount)
+        assertEquals(expectedMonthlyPayment, result.monthlyPayment)
+        assertEquals(expectedInterestPaid, result.totalInterestPaid)
+    }
+
+    @Test
     fun `should return 5 percent interest rate if age is less than 25`() {
         //given
         val birthDate = LocalDate.now().minusYears(23)

@@ -2,6 +2,7 @@ package com.project.loan_simulator.dto
 
 import com.project.loan_simulator.validation.MinimumAge
 import io.swagger.v3.oas.annotations.media.Schema
+import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.Positive
 import org.jetbrains.annotations.NotNull
 import java.math.BigDecimal
@@ -16,6 +17,7 @@ data class SimulationRequest(
     )
     @field:NotNull
     @field:Positive
+    @field:Min(100)
     val totalValue: BigDecimal,
     @field:Schema(
         description = "Date of birth of the client, must be sent as a string following the format YYYY-MM-DD",
@@ -32,5 +34,6 @@ data class SimulationRequest(
     )
     @field:NotNull
     @field:Positive
+    @field:Min(2)
     val paymentTerm: Int
 )

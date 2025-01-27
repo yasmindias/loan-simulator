@@ -22,5 +22,5 @@ class SimulationResponse(
         example = "2",
         type = "BigDecimal",
     )
-    val totalInterest: BigDecimal
+    val totalInterestPaid: BigDecimal
 )
