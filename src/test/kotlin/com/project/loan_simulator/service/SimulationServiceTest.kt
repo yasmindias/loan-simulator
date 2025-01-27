@@ -36,7 +36,7 @@ class SimulationServiceTest {
     }
 
     @Test
-    fun `should return 5 percent interest rate if age is less than 25`() {
+    fun `should return 5 percent interest rate if age is equal or less than 25`() {
         //given
         val birthDate = LocalDate.now().minusYears(23)
 
@@ -48,7 +48,7 @@ class SimulationServiceTest {
     }
 
     @Test
-    fun `should return the amount for monthly payments with success, for age less than 25`() {
+    fun `should return the amount for monthly payments with success, for age equal or less than 25`() {
         //given
         val request = MockEntityBuild.simulationRequest()
         val annualInterestRate = simulationService.returnAnnualInterestRateByAge(request.birthDate.yearsSince())

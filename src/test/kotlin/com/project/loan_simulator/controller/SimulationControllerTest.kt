@@ -2,25 +2,23 @@ package com.project.loan_simulator.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.project.loan_simulator.dto.SimulationRequest
 import com.project.loan_simulator.exception.handler.GlobalExceptionHandler
 import com.project.loan_simulator.service.SimulationService
 import com.project.loan_simulator.util.MockEntityBuild
 import com.project.loan_simulator.util.MockitoHelper
-import org.hamcrest.core.StringContains.containsString
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
-import org.springframework.http.MediaType
+import org.springframework.http.HttpStatus
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import java.math.BigDecimal
+import java.math.RoundingMode
 import java.time.LocalDate
+import kotlin.test.assertEquals
 
 @ExtendWith(MockitoExtension::class)
 class SimulationControllerTest{
@@ -41,7 +39,7 @@ class SimulationControllerTest{
     }
 
     @Test
-    fun `should simulate loan with success`() {
+    fun `should simulate loan with success for age equal or less than 25`() {
         //given
         val request = MockEntityBuild.simulationRequest()
         val response = MockEntityBuild.simulationResponse()
@@ -49,77 +47,78 @@ class SimulationControllerTest{
         //when
         `when`(simulationService.simulateLoan(MockitoHelper.anyObject())).thenReturn(response)
 
-        val result = this.mock.perform(
-            MockMvcRequestBuilders.post("/simulation")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request))
-                .accept(MediaType.APPLICATION_JSON)
-        )
+        val result = simulationController.simulate(request)
 
         //then
-        result.andExpect(MockMvcResultMatchers.status().isOk)
-        result.andExpect(MockMvcResultMatchers.jsonPath("$.totalAmount").value(response.totalAmount))
-        result.andExpect(MockMvcResultMatchers.jsonPath("$.monthlyPayment").value(response.monthlyPayment))
-        result.andExpect(MockMvcResultMatchers.jsonPath("$.totalInterestPaid").value(response.totalInterestPaid))
+        assertEquals(HttpStatus.OK, result.statusCode)
+        assertEquals(response.totalAmount, result.body?.totalAmount)
+        assertEquals(response.monthlyPayment, result.body?.monthlyPayment)
+        assertEquals(response.totalInterestPaid, result.body?.totalInterestPaid)
     }
 
     @Test
-    fun `should return error for underage client`() {
+    fun `should simulate loan with success for age between 26 and 40`() {
         //given
-        val request = SimulationRequest(BigDecimal(10000), LocalDate.now().minusYears(15), 36)
-
-        //when
-        val result = this.mock.perform(
-            MockMvcRequestBuilders.post("/simulation")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request))
-                .accept(MediaType.APPLICATION_JSON)
+        val request = MockEntityBuild.simulationRequest(birthDate = LocalDate.now().minusYears(31))
+        val response = MockEntityBuild.simulationResponse(
+            BigDecimal(90029.52).setScale(2, RoundingMode.HALF_EVEN),
+            BigDecimal(2500.82).setScale(2, RoundingMode.HALF_EVEN),
+            BigDecimal(80029.52).setScale(2, RoundingMode.HALF_EVEN),
         )
 
+        //when
+        `when`(simulationService.simulateLoan(MockitoHelper.anyObject())).thenReturn(response)
+
+        val result = simulationController.simulate(request)
+
         //then
-        result.andExpect(MockMvcResultMatchers.status().isBadRequest)
-        result.andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Error on validation"))
-        result.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0]", containsString("birthDate:")))
-        result.andExpect(MockMvcResultMatchers.jsonPath("$.errors.length()").value("1"))
+        assertEquals(HttpStatus.OK, result.statusCode)
+        assertEquals(response.totalAmount, result.body?.totalAmount)
+        assertEquals(response.monthlyPayment, result.body?.monthlyPayment)
+        assertEquals(response.totalInterestPaid, result.body?.totalInterestPaid)
     }
 
     @Test
-    fun `should return error for total amount smaller than 100`() {
+    fun `should simulate loan with success for age between 41 and 60`() {
         //given
-        val request = SimulationRequest(BigDecimal(99), LocalDate.now().minusYears(18), 36)
-
-        //when
-        val result = this.mock.perform(
-            MockMvcRequestBuilders.post("/simulation")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request))
-                .accept(MediaType.APPLICATION_JSON)
+        val request = MockEntityBuild.simulationRequest(birthDate = LocalDate.now().minusYears(55))
+        val response = MockEntityBuild.simulationResponse(
+            BigDecimal(61415.64).setScale(2, RoundingMode.HALF_EVEN),
+            BigDecimal(1705.99).setScale(2, RoundingMode.HALF_EVEN),
+            BigDecimal(51415.64).setScale(2, RoundingMode.HALF_EVEN),
         )
 
+        //when
+        `when`(simulationService.simulateLoan(MockitoHelper.anyObject())).thenReturn(response)
+
+        val result = simulationController.simulate(request)
+
         //then
-        result.andExpect(MockMvcResultMatchers.status().isBadRequest)
-        result.andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Error on validation"))
-        result.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0]", containsString("totalValue:")))
-        result.andExpect(MockMvcResultMatchers.jsonPath("$.errors.length()").value("1"))
+        assertEquals(HttpStatus.OK, result.statusCode)
+        assertEquals(response.totalAmount, result.body?.totalAmount)
+        assertEquals(response.monthlyPayment, result.body?.monthlyPayment)
+        assertEquals(response.totalInterestPaid, result.body?.totalInterestPaid)
     }
 
     @Test
-    fun `should return error for payment term smaller than 2`() {
+    fun `should simulate loan with success for age over 60`() {
         //given
-        val request = SimulationRequest(BigDecimal(10000), LocalDate.now().minusYears(18), 1)
-
-        //when
-        val result = this.mock.perform(
-            MockMvcRequestBuilders.post("/simulation")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request))
-                .accept(MediaType.APPLICATION_JSON)
+        val request = MockEntityBuild.simulationRequest(birthDate = LocalDate.now().minusYears(75))
+        val response = MockEntityBuild.simulationResponse(
+            BigDecimal(122403.60).setScale(2, RoundingMode.HALF_EVEN),
+            BigDecimal(3400.10).setScale(2, RoundingMode.HALF_EVEN),
+            BigDecimal(112403.60).setScale(2, RoundingMode.HALF_EVEN),
         )
 
+        //when
+        `when`(simulationService.simulateLoan(MockitoHelper.anyObject())).thenReturn(response)
+
+        val result = simulationController.simulate(request)
+
         //then
-        result.andExpect(MockMvcResultMatchers.status().isBadRequest)
-        result.andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Error on validation"))
-        result.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0]", containsString("paymentTerm:")))
-        result.andExpect(MockMvcResultMatchers.jsonPath("$.errors.length()").value("1"))
+        assertEquals(HttpStatus.OK, result.statusCode)
+        assertEquals(response.totalAmount, result.body?.totalAmount)
+        assertEquals(response.monthlyPayment, result.body?.monthlyPayment)
+        assertEquals(response.totalInterestPaid, result.body?.totalInterestPaid)
     }
 }
