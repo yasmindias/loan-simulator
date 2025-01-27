@@ -1,4 +1,4 @@
-[![pt-br](https://img.shields.io/badge/lang-pt--br-green.svg)](https://github.com/yasmindias/loan-simulator/blob/master/README.md)
+[![en-us](https://img.shields.io/badge/lang-en--us-red.svg)](https://github.com/yasmindias/loan-simulator/blob/master/README.en.md)
 
 # Simulador de Empréstimo #
 Esse projeto roda uma simulação de empréstimo e retorna as condições de pagamento, baseadas no valor solicitado, taxa de juros e prazo de pagamento.
@@ -10,7 +10,18 @@ Esse projeto roda uma simulação de empréstimo e retorna as condições de pag
 
 ### Rodar o projeto
 Rode o comando ```./gradlew bootRun``` pra iniciar o projeto.
-As requisições devem ser feitas na url ``http://localhost:8080``, seguindo os exemplos disponíveis no [Swagger](http://localhost:8080/swagger-ui/index.html)
+
+As requisições devem ser feitas na url ``http://localhost:8080/``, seguindo os exemplos disponíveis no [Swagger](http://localhost:8080/swagger-ui/index.html)
 
 ### Rodar os testes
-Para rodar os testes use o comando ```./gradlew test```.
+Para rodar os testes use o comando ```./gradlew clean test```.
+
+## Rodar em um Container Docker
+### Pré-requisitos
+- [Docker](https://www.docker.com/products/docker-desktop/)
+
+
+
+## Documentação
+- [Swagger](http://localhost:3000/swagger-ui/index.html)
+- 
