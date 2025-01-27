@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
+import java.math.BigDecimal
 import java.time.LocalDate
 
 @ExtendWith(MockitoExtension::class)
@@ -52,7 +53,7 @@ class SimulationControllerTest{
     @Test
     fun `should return error for underage client`() {
         //given
-        val request = SimulationRequest(10000, LocalDate.now().minusYears(15), 32)
+        val request = SimulationRequest(BigDecimal(10000), LocalDate.now().minusYears(15), 32)
 
         //when
         val result = this.mock.perform(
