@@ -14,7 +14,11 @@ Rode o comando ```./gradlew bootRun``` pra iniciar o projeto.
 As requisições devem ser feitas na url ``http://localhost:8080/``, seguindo os exemplos disponíveis no [Swagger](http://localhost:8080/swagger-ui/index.html)
 
 ### Rodar os testes
+#### Testes Unitários
 Para rodar os testes use o comando ```./gradlew clean test```.
+
+#### Testes de Integração
+Para rodar os testes de integração use o comando ```./gradlew clean integrationTest```.
 
 ## Rodar em um Container Docker
 ### Pré-requisitos

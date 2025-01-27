@@ -14,7 +14,12 @@ Run the command ```./gradlew bootRun``` to start the project.
 It will provide the url ``http://localhost:8080`` for the API calls, see [Swagger](http://localhost:8080/swagger-ui/index.html) for requests examples.
 
 ### Run Tests
+
+#### Unit Tests
 To run tests locally run the command ```./gradlew clean test```.
+
+#### Integration Tests
+To run integration tests locally run the command ```./gradlew clean integrationTest```.
 
 ## Run on Container
 ### Requirements
