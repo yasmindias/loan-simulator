@@ -36,8 +36,6 @@ tasks.register<Test>(integrationTest.name) {
 	}
 }
 
-tasks.check { dependsOn(integrationTest) }
-
 val integrationTestImplementation: Configuration by
 configurations.getting { extendsFrom(configurations.testImplementation.get()) }
 
