@@ -22,7 +22,17 @@ To run tests locally run the command ```./gradlew clean test```.
 To run integration tests locally run the command ```./gradlew clean integrationTest```.
 
 #### Performance Tests
+### Requirements
+- [Docker](https://www.docker.com/products/docker-desktop/)
 
+To run our load test we use the tool [K6](https://grafana.com/docs/k6/latest/), running in a Docker container.
+
+Use the following commands to build and run the test.
+
+```
+docker build . -t dock-k6
+docker run --add-host=host.docker.internal:host-gateway --rm dock-k6 run load_test.js
+```
 
 ## Run on Container
 ### Requirements

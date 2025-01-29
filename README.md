@@ -21,7 +21,17 @@ Para rodar os testes use o comando ```./gradlew clean test```.
 Para rodar os testes de integração use o comando ```./gradlew clean integrationTest```.
 
 #### Testes de Performance
+### Pré-requisitos
+- [Docker](https://www.docker.com/products/docker-desktop/)
 
+Para executar os testes de carga usamos a ferramenta [K6](https://grafana.com/docs/k6/latest/), rodando dentro de um container Docker.
+
+Use os seguintes comandos para buildar e rodar os testes:
+
+```
+docker build . -t dock-k6
+docker run --add-host=host.docker.internal:host-gateway --rm dock-k6 run load_test.js
+```
 
 ## Rodar em um Container Docker
 ### Pré-requisitos
