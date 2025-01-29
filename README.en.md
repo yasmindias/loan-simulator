@@ -22,9 +22,7 @@ To run tests locally run the command ```./gradlew clean test```.
 To run integration tests locally run the command ```./gradlew clean integrationTest```.
 
 #### Performance Tests
-This project uses the [Gatling](https://docs.gatling.io) lib to create and execute a performance test that send 10k requests per second to the simulation API.
 
-To run the performance test run the command ```./gradlew gatlingRun```.
 
 ## Run on Container
 ### Requirements

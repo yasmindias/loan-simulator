@@ -21,9 +21,7 @@ Para rodar os testes use o comando ```./gradlew clean test```.
 Para rodar os testes de integração use o comando ```./gradlew clean integrationTest```.
 
 #### Testes de Performance
-O projeto utiliza a lib [Gatling](https://docs.gatling.io) para criar um teste de performance que executa 10 mil requisições por segundo na API.
 
-Para rodar o teste de performance use o comando ```./gradlew gatlingRun```.
 
 ## Rodar em um Container Docker
 ### Pré-requisitos
