@@ -26,6 +26,7 @@ To run integration tests locally run the command ```./gradlew clean integrationT
 - [Docker](https://www.docker.com/products/docker-desktop/)
 
 To run our load test we use the tool [K6](https://grafana.com/docs/k6/latest/), running in a Docker container.
+The test is configured to create 10000 different simulations, if you wish to change this number you should edit the const *NUMBER_OF_SIMULATIONS* in the `load_test.js` file.
 
 Use the following commands to build and run the test.
 

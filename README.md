@@ -25,6 +25,7 @@ Para rodar os testes de integração use o comando ```./gradlew clean integratio
 - [Docker](https://www.docker.com/products/docker-desktop/)
 
 Para executar os testes de carga usamos a ferramenta [K6](https://grafana.com/docs/k6/latest/), rodando dentro de um container Docker.
+O teste está configurado para gerar 10000 simulações diferentes, caso deseje alterar esse número deve ser alterado a constante *NUMBER_OF_SIMULATIONS* no arquivo `load_test.js`
 
 Use os seguintes comandos para buildar e rodar os testes:
 
