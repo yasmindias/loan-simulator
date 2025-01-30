@@ -4,9 +4,9 @@ import com.project.loan_simulator.validation.MinimumAge
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.Positive
-import org.jetbrains.annotations.NotNull
 import java.math.BigDecimal
 import java.time.LocalDate
+import org.jetbrains.annotations.NotNull
 
 @Schema(description = "Model for requesting a loan simulation")
 data class SimulationRequest(

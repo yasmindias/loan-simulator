@@ -21,18 +21,18 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/simulation")
 class SimulationController(private val simulationService: SimulationService) {
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @PostMapping
-    fun simulate(@RequestBody @Valid request: List<SimulationRequest>): ResponseEntity<Flow<SimulationResponse>> {
-        val response = request.asFlow()
-            .flowOn(Dispatchers.IO)
-            .flatMapMerge {
-                simulation ->
-                flow {
-                    val simResponse = simulationService.simulateLoan(simulation)
-                    emit(simResponse)
-                }
-            }
-        return ResponseEntity.ok(response)
-    }
+  @OptIn(ExperimentalCoroutinesApi::class)
+  @PostMapping
+  fun simulate(
+      @RequestBody @Valid request: List<SimulationRequest>
+  ): ResponseEntity<Flow<SimulationResponse>> {
+    val response =
+        request.asFlow().flowOn(Dispatchers.IO).flatMapMerge { simulation ->
+          flow {
+            val simResponse = simulationService.simulateLoan(simulation)
+            emit(simResponse)
+          }
+        }
+    return ResponseEntity.ok(response)
+  }
 }

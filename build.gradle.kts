@@ -1,9 +1,12 @@
+import com.ncorti.ktfmt.gradle.tasks.KtfmtFormatTask
+
 plugins {
 	kotlin("jvm") version "1.9.25"
 	kotlin("plugin.spring") version "1.9.25"
 	id("org.springframework.boot") version "3.4.2"
 	id("io.spring.dependency-management") version "1.1.7"
 	kotlin("plugin.jpa") version "1.9.25"
+	id("com.ncorti.ktfmt.gradle") version "0.21.0"
 }
 
 group = "com.project"
@@ -76,3 +79,15 @@ tasks.register<Test>(integrationTest.name) {
 
 val integrationTestImplementation: Configuration by
 configurations.getting { extendsFrom(configurations.testImplementation.get()) }
+
+//-------------------------------
+//   Linter Setup
+//-------------------------------
+ktfmt {
+	maxWidth.set(110)
+}
+
+tasks.register<KtfmtFormatTask>("ktfmtPrecommit") {
+	source = project.fileTree(rootDir)
+	include("**/*.kt")
+}

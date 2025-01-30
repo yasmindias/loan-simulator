@@ -9,7 +9,7 @@ import kotlin.reflect.KClass
 @Retention(AnnotationRetention.RUNTIME)
 @Constraint(validatedBy = [MinimumAgeValidator::class])
 @MustBeDocumented
-annotation class MinimumAge (
+annotation class MinimumAge(
     val message: String = "o cliente deve ser maior de idade",
     val groups: Array<KClass<Any>> = [],
     val payload: Array<KClass<Payload>> = []

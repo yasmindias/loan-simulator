@@ -8,11 +8,11 @@ import java.time.LocalDate
 
 class MinimumAgeValidator : ConstraintValidator<MinimumAge, LocalDate> {
 
-    companion object {
-        private const val MINIMUM_AGE = 18
-    }
+  companion object {
+    private const val MINIMUM_AGE = 18
+  }
 
-    override fun isValid(value: LocalDate?, context: ConstraintValidatorContext?): Boolean {
-        return value!!.yearsSince() >= MINIMUM_AGE
-    }
+  override fun isValid(value: LocalDate?, context: ConstraintValidatorContext?): Boolean {
+    return value!!.yearsSince() >= MINIMUM_AGE
+  }
 }
