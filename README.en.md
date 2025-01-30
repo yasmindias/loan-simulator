@@ -39,7 +39,83 @@ docker run --add-host=host.docker.internal:host-gateway --rm dock-k6 run load_te
 ### Requirements
 - [Docker](https://www.docker.com/products/docker-desktop/)
 
+## Request examples
 
+### Success
+
+**Request**
+
+``POST /simulation``
+```json
+[
+    {
+        "totalValue": 66189,
+        "birthDate": "1930-01-27",
+        "paymentTerm": 40
+    },
+    {
+        "totalValue": 13000,
+        "birthDate": "1978-01-27",
+        "paymentTerm": 38
+    }
+]
+```
+
+**Response**
+```json
+[
+    {
+        "totalAmount": 900178.00,
+        "monthlyPayment": 22504.45,
+        "totalInterestPaid": 833989.00
+    },
+    {
+        "totalAmount": 84196.22,
+        "monthlyPayment": 2215.69,
+        "totalInterestPaid": 71196.22
+    }
+]
+```
+
+### Failure
+**Request**
+
+``POST /simulation``
+```json
+[
+    {
+        "totalValue": 66189,
+        "birthDate": "2018-01-27",
+        "paymentTerm": 40
+    },
+    {
+        "totalValue": 90,
+        "birthDate": "1978-01-27",
+        "paymentTerm": 38
+    },
+    {
+        "totalValue": 150,
+        "birthDate": "1995-01-27",
+        "paymentTerm": 1
+    }
+]
+```
+
+**Response**
+
+```json
+{
+	"status": 400,
+	"error": "Bad Request",
+	"message": "Error on validation",
+	"errors": [
+		"simulate.request[1].totalValue: deve ser maior que ou igual à 100",
+		"simulate.request[2].paymentTerm: deve ser maior que ou igual à 2",
+		"simulate.request[0].birthDate: o cliente deve ser maior de idade"
+	],
+	"timestamp": "2025-01-30T10:59:25.478886-03:00"
+}
+```
 
 ## Documentation
 - [Swagger](http://localhost:3000/swagger-ui/index.html)
