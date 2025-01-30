@@ -2,10 +2,12 @@ package com.project.loan_simulator.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.project.loan_simulator.exception.handler.GlobalExceptionHandler
+import com.project.loan_simulator.exception.handler.SimulationExceptionHandler
 import com.project.loan_simulator.service.SimulationService
 import com.project.loan_simulator.util.MockEntityBuild
 import com.project.loan_simulator.util.MockitoHelper
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -34,91 +36,99 @@ class SimulationControllerTest{
         this.simulationController = SimulationController(simulationService)
         this.objectMapper = ObjectMapper().registerModule(JavaTimeModule())
         this.mock = MockMvcBuilders.standaloneSetup(simulationController)
-            .setControllerAdvice(GlobalExceptionHandler())
+            .setControllerAdvice(SimulationExceptionHandler())
             .build()
     }
 
     @Test
     fun `should simulate loan with success for age equal or less than 25`() {
         //given
-        val request = MockEntityBuild.simulationRequest()
+        val request = listOf(MockEntityBuild.simulationRequest())
         val response = MockEntityBuild.simulationResponse()
 
-        //when
+        //when/then
         `when`(simulationService.simulateLoan(MockitoHelper.anyObject())).thenReturn(response)
 
-        val result = simulationController.simulate(request)
+        runBlocking {
+            val flow = simulationController.simulate(request)
+            val result = flow.body?.toList()
 
-        //then
-        assertEquals(HttpStatus.OK, result.statusCode)
-        assertEquals(response.totalAmount, result.body?.totalAmount)
-        assertEquals(response.monthlyPayment, result.body?.monthlyPayment)
-        assertEquals(response.totalInterestPaid, result.body?.totalInterestPaid)
+            assertEquals(HttpStatus.OK, flow.statusCode)
+            assertEquals(response.totalAmount, result?.first()?.totalAmount)
+            assertEquals(response.monthlyPayment, result?.first()?.monthlyPayment)
+            assertEquals(response.totalInterestPaid, result?.first()?.totalInterestPaid)
+        }
     }
 
     @Test
     fun `should simulate loan with success for age between 26 and 40`() {
         //given
-        val request = MockEntityBuild.simulationRequest(birthDate = LocalDate.now().minusYears(31))
+        val request = listOf(MockEntityBuild.simulationRequest(birthDate = LocalDate.now().minusYears(31)))
         val response = MockEntityBuild.simulationResponse(
             BigDecimal(90029.52).setScale(2, RoundingMode.HALF_EVEN),
             BigDecimal(2500.82).setScale(2, RoundingMode.HALF_EVEN),
             BigDecimal(80029.52).setScale(2, RoundingMode.HALF_EVEN),
         )
 
-        //when
+        //when/then
         `when`(simulationService.simulateLoan(MockitoHelper.anyObject())).thenReturn(response)
 
-        val result = simulationController.simulate(request)
+        runBlocking {
+            val flow = simulationController.simulate(request)
+            val result = flow.body?.toList()
 
-        //then
-        assertEquals(HttpStatus.OK, result.statusCode)
-        assertEquals(response.totalAmount, result.body?.totalAmount)
-        assertEquals(response.monthlyPayment, result.body?.monthlyPayment)
-        assertEquals(response.totalInterestPaid, result.body?.totalInterestPaid)
+            assertEquals(HttpStatus.OK, flow.statusCode)
+            assertEquals(response.totalAmount, result?.first()?.totalAmount)
+            assertEquals(response.monthlyPayment, result?.first()?.monthlyPayment)
+            assertEquals(response.totalInterestPaid, result?.first()?.totalInterestPaid)
+        }
     }
 
     @Test
     fun `should simulate loan with success for age between 41 and 60`() {
         //given
-        val request = MockEntityBuild.simulationRequest(birthDate = LocalDate.now().minusYears(55))
+        val request = listOf(MockEntityBuild.simulationRequest(birthDate = LocalDate.now().minusYears(55)))
         val response = MockEntityBuild.simulationResponse(
             BigDecimal(61415.64).setScale(2, RoundingMode.HALF_EVEN),
             BigDecimal(1705.99).setScale(2, RoundingMode.HALF_EVEN),
             BigDecimal(51415.64).setScale(2, RoundingMode.HALF_EVEN),
         )
 
-        //when
+        //when/then
         `when`(simulationService.simulateLoan(MockitoHelper.anyObject())).thenReturn(response)
 
-        val result = simulationController.simulate(request)
+        runBlocking {
+            val flow = simulationController.simulate(request)
+            val result = flow.body?.toList()
 
-        //then
-        assertEquals(HttpStatus.OK, result.statusCode)
-        assertEquals(response.totalAmount, result.body?.totalAmount)
-        assertEquals(response.monthlyPayment, result.body?.monthlyPayment)
-        assertEquals(response.totalInterestPaid, result.body?.totalInterestPaid)
+            assertEquals(HttpStatus.OK, flow.statusCode)
+            assertEquals(response.totalAmount, result?.first()?.totalAmount)
+            assertEquals(response.monthlyPayment, result?.first()?.monthlyPayment)
+            assertEquals(response.totalInterestPaid, result?.first()?.totalInterestPaid)
+        }
     }
 
     @Test
     fun `should simulate loan with success for age over 60`() {
         //given
-        val request = MockEntityBuild.simulationRequest(birthDate = LocalDate.now().minusYears(75))
+        val request = listOf(MockEntityBuild.simulationRequest(birthDate = LocalDate.now().minusYears(75)))
         val response = MockEntityBuild.simulationResponse(
             BigDecimal(122403.60).setScale(2, RoundingMode.HALF_EVEN),
             BigDecimal(3400.10).setScale(2, RoundingMode.HALF_EVEN),
             BigDecimal(112403.60).setScale(2, RoundingMode.HALF_EVEN),
         )
 
-        //when
+        //when/then
         `when`(simulationService.simulateLoan(MockitoHelper.anyObject())).thenReturn(response)
 
-        val result = simulationController.simulate(request)
+        runBlocking {
+            val flow = simulationController.simulate(request)
+            val result = flow.body?.toList()
 
-        //then
-        assertEquals(HttpStatus.OK, result.statusCode)
-        assertEquals(response.totalAmount, result.body?.totalAmount)
-        assertEquals(response.monthlyPayment, result.body?.monthlyPayment)
-        assertEquals(response.totalInterestPaid, result.body?.totalInterestPaid)
+            assertEquals(HttpStatus.OK, flow.statusCode)
+            assertEquals(response.totalAmount, result?.first()?.totalAmount)
+            assertEquals(response.monthlyPayment, result?.first()?.monthlyPayment)
+            assertEquals(response.totalInterestPaid, result?.first()?.totalInterestPaid)
+        }
     }
 }

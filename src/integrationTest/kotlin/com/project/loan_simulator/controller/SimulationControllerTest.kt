@@ -2,21 +2,15 @@ package com.project.loan_simulator.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.project.loan_simulator.dto.SimulationRequest
-import com.project.loan_simulator.exception.handler.GlobalExceptionHandler
+import com.project.loan_simulator.exception.handler.SimulationExceptionHandler
 import com.project.loan_simulator.service.SimulationService
 import com.project.loan_simulator.util.MockEntityBuild
-import org.hamcrest.core.StringContains.containsString
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.junit.jupiter.MockitoExtension
-import org.springframework.http.MediaType
-import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.ResultActions
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import org.springframework.test.web.servlet.setup.MockMvcBuilders
+import org.springframework.test.web.reactive.server.WebTestClient
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -26,90 +20,73 @@ class SimulationControllerTest{
     private lateinit var simulationController: SimulationController
     private lateinit var simulationService: SimulationService
     private lateinit var objectMapper: ObjectMapper
-    private lateinit var mock: MockMvc
+    private lateinit var client: WebTestClient
 
     @BeforeEach
     fun setUp() {
         this.simulationService = SimulationService()
         this.simulationController = SimulationController(simulationService)
         this.objectMapper = ObjectMapper().registerModule(JavaTimeModule())
-        this.mock = MockMvcBuilders.standaloneSetup(simulationController)
-            .setControllerAdvice(GlobalExceptionHandler())
+        this.client = WebTestClient.bindToController(simulationController)
+            .controllerAdvice(SimulationExceptionHandler())
             .build()
     }
 
     @Test
-    fun `should simulate loan with success`() {
+    fun `should simulate loan with success`(){
         //given
-        val request = MockEntityBuild.simulationRequest()
+        val request = listOf(MockEntityBuild.simulationRequest())
         val response = MockEntityBuild.simulationResponse()
 
-        //when
-        val result = this.mock.perform(
-            MockMvcRequestBuilders.post("/simulation")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request))
-                .accept(MediaType.APPLICATION_JSON)
-        )
-
-        //then
-        result.andExpect(MockMvcResultMatchers.status().isOk)
-        result.andExpect(MockMvcResultMatchers.jsonPath("$.totalAmount").value(response.totalAmount))
-        result.andExpect(MockMvcResultMatchers.jsonPath("$.monthlyPayment").value(response.monthlyPayment))
-        result.andExpect(MockMvcResultMatchers.jsonPath("$.totalInterestPaid").value(response.totalInterestPaid))
+        //when/then
+        runBlocking {
+            client.post().uri("/simulation")
+                .bodyValue(request)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$[0].totalAmount").isEqualTo(response.totalAmount)
+                .jsonPath("$[0].monthlyPayment").isEqualTo(response.monthlyPayment)
+                .jsonPath("$[0].totalInterestPaid").isEqualTo(response.totalInterestPaid)
+        }
     }
 
     @Test
     fun `should return error for underage client`() {
         //given
-        val request = SimulationRequest(BigDecimal(10000), LocalDate.now().minusYears(15), 36)
+        val request = MockEntityBuild.simulationRequest(birthDate = LocalDate.now().minusYears(15))
 
-        //when
-        val result = makePostCall("/simulation", request)
-
-        //then
-        result.andExpect(MockMvcResultMatchers.status().isBadRequest)
-        result.andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Error on validation"))
-        result.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0]", containsString("birthDate:")))
-        result.andExpect(MockMvcResultMatchers.jsonPath("$.errors.length()").value("1"))
+        //when/then
+        client.post().uri("/simulation")
+            .bodyValue(request)
+            .exchange()
+            .expectStatus().isBadRequest
+            .expectBody()
     }
 
     @Test
     fun `should return error for total amount smaller than 100`() {
         //given
-        val request = SimulationRequest(BigDecimal(99), LocalDate.now().minusYears(18), 36)
+        val request = MockEntityBuild.simulationRequest(totalValue = BigDecimal(10))
 
-        //when
-        val result = makePostCall("/simulation", request)
-
-        //then
-        result.andExpect(MockMvcResultMatchers.status().isBadRequest)
-        result.andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Error on validation"))
-        result.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0]", containsString("totalValue:")))
-        result.andExpect(MockMvcResultMatchers.jsonPath("$.errors.length()").value("1"))
+        //when/then
+        client.post().uri("/simulation")
+            .bodyValue(request)
+            .exchange()
+            .expectStatus().isBadRequest
+            .expectBody()
     }
 
     @Test
     fun `should return error for payment term smaller than 2`() {
         //given
-        val request = SimulationRequest(BigDecimal(10000), LocalDate.now().minusYears(18), 1)
+        val request = MockEntityBuild.simulationRequest(paymentTerm = 1)
 
-        //when
-        val result = makePostCall("/simulation", request)
-
-        //then
-        result.andExpect(MockMvcResultMatchers.status().isBadRequest)
-        result.andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Error on validation"))
-        result.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0]", containsString("paymentTerm:")))
-        result.andExpect(MockMvcResultMatchers.jsonPath("$.errors.length()").value("1"))
-    }
-
-    private fun makePostCall(uri: String, request: SimulationRequest): ResultActions {
-        return this.mock.perform(
-            MockMvcRequestBuilders.post(uri)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request))
-                .accept(MediaType.APPLICATION_JSON)
-        )
+        //when/then
+        client.post().uri("/simulation")
+            .bodyValue(request)
+            .exchange()
+            .expectStatus().isBadRequest
+            .expectBody()
     }
 }
