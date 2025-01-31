@@ -39,6 +39,14 @@ docker run --add-host=host.docker.internal:host-gateway --rm dock-k6 run load_te
 ### Requirements
 - [Docker](https://www.docker.com/products/docker-desktop/)
 
+Use the following commands to build and start the application:
+```
+docker build -t loan-simulator . 
+docker run -p 8080:8080 loan-simulator
+```
+
+If you are using MacOS with Apple Silicon add the flag ``--platform=linux/arm64`` to the build command.
+
 ## Request examples
 
 ### Success
