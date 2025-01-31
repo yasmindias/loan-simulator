@@ -7,19 +7,19 @@ import java.math.BigDecimal
 class SimulationResponse(
     @field:Schema(
         description = "Total amount to be payed",
-        example = "10000",
+        example = "12500.90",
         type = "BigDecimal",
     )
     val totalAmount: BigDecimal,
     @field:Schema(
         description = "The amount to be payed monthly",
-        example = "1500",
+        example = "1500.25",
         type = "BigDecimal",
     )
     val monthlyPayment: BigDecimal,
     @field:Schema(
         description = "The amount of interest to be paid",
-        example = "2",
+        example = "12500.01",
         type = "BigDecimal",
     )
     val totalInterestPaid: BigDecimal

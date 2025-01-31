@@ -118,7 +118,7 @@ docker run --add-host=host.docker.internal:host-gateway --rm dock-k6 run load_te
 ```
 
 ## Documentation
-- [Swagger](http://localhost:3000/swagger-ui/index.html)
+- [Swagger](http://localhost:8080/swagger-ui/index.html)
 
 ## Solution
 ### Context
