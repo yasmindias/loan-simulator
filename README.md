@@ -119,4 +119,27 @@ docker run --add-host=host.docker.internal:host-gateway --rm dock-k6 run load_te
 
 ## Documentação
 - [Swagger](http://localhost:3000/swagger-ui/index.html)
--  
+
+## Solução
+
+### Contexto
+Projetar uma API que recebe uma requisição com *n* dados e para cada conjunto de dados retorna uma simulação de empréstimo.
+
+### Decisão e Justificativa
+Decidi implementar uma solução onde o endpoint recebe um array com os dados a serem usados nas simulações, e cada conjunto de dados é repassado para uma Coroutine para ser validado e depois ser feita a simulação.
+A classe de serviço então roda a simulação e retorna um objeto contendo o *valor total* a ser pago, o valor dos *pagamentos mensais* e o *total de juros* a ser pago.
+
+Essa abordagem garante que os dados serão processados em paralelo, fazendo com que o tempo de processamento seja menor e possibilitando que o sistema lide com um número maior de dados.
+
+### Consequência
+Para verificar a performabilidade da API fizemos 3 testes de carga, utilizando a ferramenta K6 rodando em um container Docker, com diferentes quantidades de dados: 1.000, 10.000, 500.000.
+Os resultados são
+
+**1.000 requisições - Tempo de resposta: 28.52ms**
+![1000-requisições](src/main/resources/docs/img/1000-reqs.png)
+
+**10.000 requisições - Tempo de resposta: 118.04ms**
+![10000-requisições](src/main/resources/docs/img/10000-reqs.png)
+
+**500.000 requisições - Tempo de resposta: 5.79s**
+![500000-requisições](src/main/resources/docs/img/500000-reqs.png)
